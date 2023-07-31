@@ -85,62 +85,10 @@ double get_bg_level(
     return sum / counter;
 }
 
-void minimalistic_first_burst_search(
-        const double & threshold, // порог детектирования
-        const double & bg_level,  // уровень фона
-        const vector <double> & arr_time,
-        const vector <int> & arr_counts
-        )
-{
-    double
-        burst_begin_time, // время начала всплеска
-        burst_end_time;   // время конца всплеска
-
-    bool excess_found = false;
-
-    // общий случай (конец интервала поиска -- конец массива)
-    int i_max = arr_counts.size();
-
-    for (int i = 0; i < arr_counts.size(); ++i) {
-
-        // нет смысла начинать суммировать с бина ниже фона
-        if (arr_counts[i] < bg_level) {continue;}
-
-        int length = 0;
-        double C_tot = 0; // полное число отсчётов на выбранном интервале
-
-        for (int j = i; j < i_max; ++j) {
-
-            length++;
-            C_tot += arr_counts[j];
-            double C_bg = bg_level * length; // число отсчётов от фона на выбранном интервале
-            double frac = (C_tot - C_bg) / sqrt(C_bg);
-
-            if (frac > threshold) {
-                burst_begin_time = arr_time[i];
-                burst_end_time = arr_time[j];
-
-                excess_found = true;
-                i_max--;
-            }
-        }
-    }
-
-    if(!excess_found) {
-        cout << "Bursts not found.\n";
-        return;
-    }
-
-    cout.precision(4);
-    cout << "Burst search results:" << '\n';
-    cout << "Start time: " << burst_begin_time << '\n';
-    cout << "End time: " << burst_end_time << '\n';
-}
-
-
+// minimalistic edition
 void burst_search(
-        const double & Ti,        // начало интервала поиска всплеска
-        const double & Tf,        // конец интервала поиска всплеска
+        //const double & Ti,        // начало интервала поиска всплеска
+        //const double & Tf,        // конец интервала поиска всплеска
         const double & threshold, // порог детектирования
         const double & bg_level,  // уровень фона
         const vector <double> & arr_time,
@@ -159,15 +107,15 @@ void burst_search(
 
     // ограничиваем конец интервала поиска
     // caution! учитываем, что данные подаются с интервалом в одну секунду
-    int Tf_i = Tf - arr_time[0];
-    int i_max = Tf_i;
+    //int Tf_i = Tf - arr_time[0];
+    //int i_max = Tf_i;
 
     // общий случай (конец интервала поиска -- конец массива)
-    // int i_max = arr_counts.size();
+    int i_max = arr_counts.size();
 
     for (int i = 0; i < arr_counts.size(); ++i) {
-        if (arr_time[i] < Ti) {continue;}
-        if (arr_time[i] == Tf) {break;}
+        //if (arr_time[i] < Ti) {continue;}
+        //if (arr_time[i] == Tf) {break;}
 
         // нет смысла начинать суммировать с бина ниже фона
         if (arr_counts[i] < bg_level) {continue;}
@@ -229,20 +177,86 @@ void where_are_my_bursts(
     cout << "Bg. level: " << bg_level << "\n\n";
 
     // анализируем на всплески
-    minimalistic_first_burst_search(threshold, bg_level, time, counts);
+    burst_search(threshold, bg_level, time, counts);
 }
 
+string choose_input_file_extended() {
+    cout << "You can read any file from list below. \n\n";
+    // мб как-то по другому отображать файлы, например, даты+
+    cout << "1. krf20090227_49415_1_S1.thr\n";
+    cout << "2. krf20090406_62535_1_S1.thr\n";
+    cout << "3. krf20090409_53058_1_S2.thr\n";
+    cout << "4. krf20090523_34077_1_S2.thr\n";
+    cout << "5. krf20090605_74449_1_S1.thr\n";
+    cout << "6. krf20090718_65864_1_S2.thr\n";
+    cout << "7. krf20090719_5488_1_S2.thr\n";
+    cout << "8. krf20090804_73601_1_S2.thr\n";
+    cout << "9. krf20090929_16384_1_S2.thr\n";
+    cout << "\nEnter the number of the chosen file to read it: ";
+
+    int file_number;
+    cin >> file_number;
+
+    switch(file_number){
+        case 1:
+            return "data\\krf20090227_49415_1_S1.thr";
+        case 2:
+            return "data\\krf20090406_62535_1_S1.thr";
+        case 3:
+            return "data\\krf20090409_53058_1_S2.thr";
+        case 4:
+            return "data\\krf20090523_34077_1_S2.thr";
+        case 5:
+            return "data\\krf20090605_74449_1_S1.thr";
+        case 6:
+            return "data\\krf20090718_65864_1_S2.thr";
+        case 7:
+            return "data\\krf20090719_5488_1_S2.thr";
+        case 8:
+            return "data\\krf20090804_73601_1_S2.thr";
+        case 9:
+            return "data\\krf20090929_16384_1_S2.thr";
+        default:
+            return "you chose an missing option.\n";
+    }
+}
+
+string choose_input_file() {
+    cout << "Enter the file number 1-9 to read it (0 - if you need help): ";
+
+    int file_number;
+    cin >> file_number;
+
+    switch(file_number){
+        case 0:
+            return choose_input_file_extended();
+        case 1:
+            return "data\\krf20090227_49415_1_S1.thr";
+        case 2:
+            return "data\\krf20090406_62535_1_S1.thr";
+        case 3:
+            return "data\\krf20090409_53058_1_S2.thr";
+        case 4:
+            return "data\\krf20090523_34077_1_S2.thr";
+        case 5:
+            return "data\\krf20090605_74449_1_S1.thr";
+        case 6:
+            return "data\\krf20090718_65864_1_S2.thr";
+        case 7:
+            return "data\\krf20090719_5488_1_S2.thr";
+        case 8:
+            return "data\\krf20090804_73601_1_S2.thr";
+        case 9:
+            return "data\\krf20090929_16384_1_S2.thr";
+        default:
+            return "you chose an missing option.\n";
+    }
+}
 
 int main() {
-    // можно сделать штуку, которая выведет доступные название и path, чтобы копировать
-
-    // выбираем из какого файла читать данные // FIX IT!
-    // можно сделать удобный ввод без кавычек
-    /* string file_name;
-    cout << "Enter the file name with quotation marks: ";
-    cin >> file_name; */
-
-    string file_name = "data\\krf20090227_49415_1_S1.thr";
+    // выбираем из какого файла читать данные
+    string file_name = choose_input_file();
+    // string file_name = "data\\krf20090227_49415_1_S1.thr";
 
     // определяем границы интервала поиска всплеска
     const double data_begin_time = -125.0; // начало всплеска
@@ -291,5 +305,12 @@ int main() {
     return 0;
 }
 
-// пофиксить и потестить, что есть
+// Не стоит это читать =) Это наброски моих следующих действий и размышления. 
+
+// почему burst_search плохо работает?
+
 // написать нормальную функцию, которая находит все всплески, а не только первый
+/*  поиск по высоким точкам + алгоритм запускается для каждой -- так себе идея 
+    поиск по значимым превышениям типа n * bg_level и выбор интервала до таких точек? 
+    но тогда проблемы, если bg_level близок к нулю
+*/
