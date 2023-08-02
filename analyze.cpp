@@ -139,7 +139,7 @@ void burst_search(
             double C_bg = bg_level * length; // число отсчётов от фона на выбранном интервале
             double frac = (C_tot - C_bg) / sqrt(C_bg);
 
-            if (frac > threshold) {
+            if (frac > threshold && arr_time[i] != arr_time[j]) {
                 burst_begin_time = arr_time[i];
                 burst_end_time = arr_time[j];
                 counts_tot = C_tot;
