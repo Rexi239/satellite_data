@@ -177,7 +177,7 @@ void burst_search(
 
 }
 
-void where_are_my_bursts(
+void where_are_the_bursts(
         const double & data_begin_time,
         const double & data_end_time,
         const double & threshold, // порог детектирования
@@ -190,9 +190,18 @@ void where_are_my_bursts(
 
     while (!all_bursts_found) {
 
+        // будем рассчитывать bg_level на отрезке фиксированной длины, который начинается с конца послведнего всплеска
+        double k = 20.0; // длина отрезка расчета фона
+
         // задаем границы поиска уровня фона
+        double bg_begin_time = last_burst_end_time;
         double bg_end_time = data_end_time;
-        double bg_begin_time = data_begin_time;
+
+        if (last_burst_end_time < data_end_time - k) {
+            bg_end_time = last_burst_end_time + k;
+        } else {
+            bg_begin_time = data_end_time - k;
+        }
 
         // определяем уровень фона в интересующем нас всплеске
         double bg_level = get_bg_level(
@@ -304,11 +313,6 @@ int main() {
     string file_name = select_input_file();
     // string file_name = "data\\krf20090227_49415_1_S1.thr";
 
-    // определяем границы интервала поиска всплеска
-    const double data_begin_time = -125.0; // начало всплеска
-    const double data_end_time = 125.0; // конец всплеска
-    const double bg_end_time = -70.0; // конец фонового интервала
-
     const double threshold = 5; // порог (значимость) детектирования
 
     // задаем массивы для записи данных
@@ -338,9 +342,8 @@ int main() {
 
     // выбираем диапазон всплеска
     int counts_number = select_energy_interval();
-    // cerr << counts_number << endl;
 
-    // как сделать менее громоздко?
+    // ?как сделать менее громоздко?
     vector <int> counts;
     switch (counts_number) {
         case 1:
@@ -385,7 +388,7 @@ int main() {
     }
 
     // анализируем набор данных на наличие всплесков
-    where_are_my_bursts(
+    where_are_the_bursts(
             time1[0],
             time1[time1.size() - 1],
             threshold,
@@ -398,10 +401,7 @@ int main() {
 
 // Не стоит это читать =) Это наброски моих следующих действий и размышления.
 
-// почему burst_search плохо работает?
+// как проверить корректность работы burst_search? всплески незаметны?
+// улучшить алгоритм определения bg_level
 
-// написать нормальную функцию, которая находит все всплески, а не только первый
-/*  поиск по высоким точкам + алгоритм запускается для каждой -- так себе идея
-    поиск по значимым превышениям типа n * bg_level и выбор интервала до таких точек?
-    но тогда проблемы, если bg_level близок к нулю
-*/
+// как превратить switch во что-то поменьше?
