@@ -155,19 +155,23 @@ void burst_search(
 
     if(!excess_found) {
         all_bursts_found = true;
-        cout << "Bursts not found.\n";
+        cout << "No (more) bursts found.\n";
         return;
     }
 
-    cout.precision(4);
-    cout << "Burst found!" << '\n';
+    cout.precision(6);
+    //minimalistic output
+    cout << "Burst: from " << burst_begin_time << " to " << burst_end_time << ". Bg. level: " << bg_level << ".\n";
+
+    // extended output
+    /* cout << "Burst found!" << '\n';
     cout << "Bg. level: " << bg_level << '\n';
     cout << "Start time: " << burst_begin_time << '\n';
     cout << "End time: " << burst_end_time << '\n';
-    //cout << "Duration: " << dt_burst << '\n';
-    //cout << "Counts tot: " << counts_tot << '\n';
-    //cout << "Counts bg: " << counts_bg << '\n';
-    //cout << "Significance: " << frac_detected << '\n';
+    cout << "Duration: " << dt_burst << '\n';
+    cout << "Counts tot: " << counts_tot << '\n';
+    cout << "Counts bg: " << counts_bg << '\n';
+    cout << "Significance: " << frac_detected << '\n'; */
 
     last_burst_end_time = burst_end_time;
 
@@ -252,7 +256,7 @@ string select_input_file_extended() {
         case 9:
             return "data\\krf20090929_16384_1_S2.thr";
         default:
-            return "you chose a missing option.\n";
+            return "you have selected a missing option.\n";
     }
 }
 
@@ -284,12 +288,12 @@ string select_input_file() {
         case 9:
             return "data\\krf20090929_16384_1_S2.thr";
         default:
-            return "you chose a missing option.\n";
+            return "you have selected a missing option.\n";
     }
 }
 
 int select_energy_interval(){
-    cout << "Select the energy interval according to table in ReadMe.\nEnter the chosen number (1-12): ";
+    cout << "Select energy interval according to the table in ReadMe.\nEnter the chosen number (1-12): ";
     int counts_number;
     cin >> counts_number;
     return counts_number;
