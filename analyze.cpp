@@ -92,10 +92,12 @@ double get_bg_level(
     return sum / counter;
 }
 
-// minimalistic edition
+// ищет первый всплеск на заданном диапазоне
 void burst_search(
-        //const double & Ti,        // начало интервала поиска всплеска
-        //const double & Tf,        // конец интервала поиска всплеска
+        bool & all_bursts_found,
+        double & last_burst_end_time,
+        const double & Ti,        // начало интервала поиска всплеска
+        const double & Tf,        // конец интервала поиска всплеска // избыточно
         const double & threshold, // порог детектирования
         const double & bg_level,  // уровень фона
         const vector <double> & arr_time,
@@ -103,12 +105,12 @@ void burst_search(
 )
 {
     double
-            burst_begin_time, // время начала всплеска
-    burst_end_time,   // время конца всплеска
-    counts_tot,       // полное число отсчётов при поиске превышения
-    counts_bg,        // число отсчётов фона при поиске превышения
-    frac_detected,    // значимость обнаруженного всплеска
-    dt_burst;         // длителность интервала всплеска
+        burst_begin_time, // время начала всплеска
+        burst_end_time,   // время конца всплеска
+        counts_tot,       // полное число отсчётов при поиске превышения
+        counts_bg,        // число отсчётов фона при поиске превышения
+        frac_detected,    // значимость обнаруженного всплеска
+        dt_burst;         // длителность интервала всплеска
 
     bool excess_found = false;
 
@@ -121,8 +123,8 @@ void burst_search(
     int i_max = arr_counts.size();
 
     for (int i = 0; i < arr_counts.size(); ++i) {
-        //if (arr_time[i] < Ti) {continue;}
-        //if (arr_time[i] == Tf) {break;}
+        if (arr_time[i] <= Ti) {continue;}
+        if (arr_time[i] >= Tf) {break;}
 
         // нет смысла начинать суммировать с бина ниже фона
         if (arr_counts[i] < bg_level) {continue;}
@@ -152,39 +154,65 @@ void burst_search(
     }
 
     if(!excess_found) {
+        all_bursts_found = true;
         cout << "Bursts not found.\n";
         return;
     }
 
     cout.precision(4);
-    cout << "Burst search results:" << '\n';
+    cout << "Burst found!" << '\n';
+    cout << "Bg. level: " << bg_level << '\n';
     cout << "Start time: " << burst_begin_time << '\n';
     cout << "End time: " << burst_end_time << '\n';
-    cout << "Duration: " << dt_burst << '\n';
-    cout << "Counts tot: " << counts_tot << '\n';
-    cout << "Counts bg: " << counts_bg << '\n';
-    cout << "Significance: " << frac_detected << '\n';
+    //cout << "Duration: " << dt_burst << '\n';
+    //cout << "Counts tot: " << counts_tot << '\n';
+    //cout << "Counts bg: " << counts_bg << '\n';
+    //cout << "Significance: " << frac_detected << '\n';
+
+    last_burst_end_time = burst_end_time;
+
 }
 
 void where_are_my_bursts(
         const double & data_begin_time,
-        const double & bg_end_time,
+        const double & data_end_time,
         const double & threshold, // порог детектирования
         const vector <double> & time,
         const vector <int> & counts
 )
 {
-    // определяем уровень фона в интересующем нас всплеске
-    double bg_level = get_bg_level(
-            data_begin_time,
-            bg_end_time,
-            time,
-            counts
-    );
-    cout << "Bg. level: " << bg_level << "\n\n";
+    bool all_bursts_found = false;
+    double last_burst_end_time = data_begin_time;
 
-    // анализируем на всплески
-    burst_search(threshold, bg_level, time, counts);
+    while (!all_bursts_found) {
+
+        // задаем границы поиска уровня фона
+        double bg_end_time = data_end_time;
+        double bg_begin_time = data_begin_time;
+
+        // определяем уровень фона в интересующем нас всплеске
+        double bg_level = get_bg_level(
+                bg_begin_time,
+                bg_end_time,
+                time,
+                counts
+        );
+        //cout << "Bg. level: " << bg_level << "\n\n";
+
+        // анализируем на всплески
+        burst_search(
+                all_bursts_found,
+                last_burst_end_time,
+                last_burst_end_time,
+                data_end_time,
+                threshold,
+                bg_level,
+                time,
+                counts
+                );
+    }
+
+
 }
 
 string select_input_file_extended() {
