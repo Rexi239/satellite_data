@@ -18,18 +18,7 @@ void read_data (
         const string & file_name,
         vector <double> & time1,
         vector <double> & time2,
-        vector <int> & counts1,    // 8to10
-        vector <int> & counts2,    // 10to16
-        vector <int> & counts3,    // 16to25
-        vector <int> & counts4,    // 25to40
-        vector <int> & counts5,    // 40to64
-        vector <int> & counts6,    // 64to100
-        vector <int> & counts7,    // 100to160
-        vector <int> & counts8,    // 160to250
-        vector <int> & counts9,    // 250to400
-        vector <int> & counts10,   // 400to640
-        vector <int> & counts11,   // 640to1000
-        vector <int> & counts12   // from1000
+        vector <vector <int> > & c
 )
 {
     ifstream in(file_name);
@@ -49,18 +38,19 @@ void read_data (
 
         time1.push_back(t1);
         time2.push_back(t2);
-        counts1.push_back(c1);
-        counts2.push_back(c2);
-        counts3.push_back(c3);
-        counts4.push_back(c4);
-        counts5.push_back(c5);
-        counts6.push_back(c6);
-        counts7.push_back(c7);
-        counts8.push_back(c8);
-        counts9.push_back(c9);
-        counts10.push_back(c10);
-        counts11.push_back(c11);
-        counts12.push_back(c12);
+
+        c[0].push_back(c1);
+        c[1].push_back(c2);
+        c[2].push_back(c3);
+        c[3].push_back(c4);
+        c[4].push_back(c5);
+        c[5].push_back(c6);
+        c[6].push_back(c7);
+        c[7].push_back(c8);
+        c[8].push_back(c9);
+        c[9].push_back(c10);
+        c[10].push_back(c11);
+        c[11].push_back(c12);
     }
 
     cout << "File " << file_name << " has been read" << "\n\n";
@@ -190,7 +180,7 @@ void where_are_the_bursts(
 
     while (!all_bursts_found) {
 
-        // будем рассчитывать bg_level на отрезке фиксированной длины, который начинается с конца послведнего всплеска
+        // будем рассчитывать bg_level на отрезке фиксированной длины, который начинается с конца последнего всплеска
         double k = 20.0; // длина отрезка расчета фона
 
         // задаем границы поиска уровня фона
@@ -210,7 +200,6 @@ void where_are_the_bursts(
                 time,
                 counts
         );
-        //cout << "Bg. level: " << bg_level << "\n\n";
 
         // анализируем на всплески
         burst_search(
@@ -224,8 +213,6 @@ void where_are_the_bursts(
                 counts
                 );
     }
-
-
 }
 
 string select_input_file_extended() {
@@ -301,91 +288,56 @@ string select_input_file() {
     }
 }
 
-int select_energy_interval(){
+vector<int> select_energy_interval(vector <vector <int> > & c){
     cout << "Select energy interval according to the table in ReadMe.\nEnter the chosen number (1-12): ";
     int counts_number;
     cin >> counts_number;
-    return counts_number;
+
+    switch (counts_number) {
+        case 1:
+            return copy(c[0]);
+        case 2:
+            return copy(c[1]);
+        case 3:
+            return copy(c[2]);
+        case 4:
+            return copy(c[3]);
+        case 5:
+            return copy(c[4]);
+        case 6:
+            return copy(c[5]);
+        case 7:
+            return copy(c[6]);
+        case 8:
+            return copy(c[7]);
+        case 9:
+            return copy(c[8]);
+        case 10:
+            return copy(c[9]);
+        case 11:
+            return copy(c[10]);
+        case 12:
+            return copy(c[11]);
+        default:
+            cout << "You chose a missing option.\n";
+            vector <int> nothing;
+            return nothing;
+    }
 }
 
 int main() {
-    // выбираем из какого файла читать данные
+    // выбираем, из какого файла читать данные
     string file_name = select_input_file();
-    // string file_name = "data\\krf20090227_49415_1_S1.thr";
-
-    const double threshold = 5; // порог (значимость) детектирования
 
     // задаем массивы для записи данных
     vector <double> time1;
     vector <double> time2;
+    vector <vector <int> > c (12); // counts[i]
 
-    vector <int> counts1;    // 8to10
-    vector <int> counts2;    // 10to16
-    vector <int> counts3;    // 16to25
-    vector <int> counts4;    // 25to40
-    vector <int> counts5;    // 40to64
-    vector <int> counts6;    // 64to100
-    vector <int> counts7;    // 100to160
-    vector <int> counts8;    // 160to250
-    vector <int> counts9;    // 250to400
-    vector <int> counts10;   // 400to640
-    vector <int> counts11;   // 640to1000
-    vector <int> counts12;   // from1000
+    const double threshold = 5; // порог (значимость) детектирования
 
     // читаем файл
-    read_data(
-            file_name,
-            time1, time2,
-            counts1, counts2, counts3, counts4, counts5, counts6,
-            counts7, counts8, counts9, counts10, counts11, counts12
-    );
-
-    // выбираем диапазон всплеска
-    int counts_number = select_energy_interval();
-
-    // ?как сделать менее громоздко?
-    vector <int> counts;
-    switch (counts_number) {
-        case 1:
-            counts = copy(counts1);
-            break;
-        case 2:
-            counts = copy(counts2);
-            break;
-        case 3:
-            counts = copy(counts3);
-            break;
-        case 4:
-            counts = copy(counts4);
-            break;
-        case 5:
-            counts = copy(counts5);
-            break;
-        case 6:
-            counts = copy(counts6);
-            break;
-        case 7:
-            counts = copy(counts7);
-            break;
-        case 8:
-            counts = copy(counts8);
-            break;
-        case 9:
-            counts = copy(counts9);
-            break;
-        case 10:
-            counts = copy(counts10);
-            break;
-        case 11:
-            counts = copy(counts11);
-            break;
-        case 12:
-            counts = copy(counts12);
-            break;
-        default:
-            cout << "You chose a missing option.\n";
-            return 0;
-    }
+    read_data(file_name,time1, time2,c);
 
     // анализируем набор данных на наличие всплесков
     where_are_the_bursts(
@@ -393,7 +345,7 @@ int main() {
             time1[time1.size() - 1],
             threshold,
             time1,
-            counts
+            select_energy_interval(c) // выбираем энергетический диапазон
     );
 
     return 0;
@@ -403,5 +355,3 @@ int main() {
 
 // как проверить корректность работы burst_search? всплески незаметны?
 // улучшить алгоритм определения bg_level
-
-// как превратить switch во что-то поменьше?
