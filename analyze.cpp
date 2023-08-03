@@ -34,23 +34,14 @@ void read_data (
     // читаем данные массивов
     while (in.good()) {
         in >> t1 >> t2;
-        in >> c1 >> c2 >> c3 >> c4 >> c5 >> c6 >> c7 >> c8 >> c9 >> c10 >> c11 >> c12;
-
         time1.push_back(t1);
         time2.push_back(t2);
 
-        c[0].push_back(c1);
-        c[1].push_back(c2);
-        c[2].push_back(c3);
-        c[3].push_back(c4);
-        c[4].push_back(c5);
-        c[5].push_back(c6);
-        c[6].push_back(c7);
-        c[7].push_back(c8);
-        c[8].push_back(c9);
-        c[9].push_back(c10);
-        c[10].push_back(c11);
-        c[11].push_back(c12);
+        for (int i = 0; i < 12; ++i) {
+            int ci;
+            in >> ci;
+            c[i].push_back(ci);
+        }
     }
 
     cout << "File " << file_name << " has been read" << "\n\n";
@@ -293,36 +284,13 @@ vector<int> select_energy_interval(vector <vector <int> > & c){
     int counts_number;
     cin >> counts_number;
 
-    switch (counts_number) {
-        case 1:
-            return copy(c[0]);
-        case 2:
-            return copy(c[1]);
-        case 3:
-            return copy(c[2]);
-        case 4:
-            return copy(c[3]);
-        case 5:
-            return copy(c[4]);
-        case 6:
-            return copy(c[5]);
-        case 7:
-            return copy(c[6]);
-        case 8:
-            return copy(c[7]);
-        case 9:
-            return copy(c[8]);
-        case 10:
-            return copy(c[9]);
-        case 11:
-            return copy(c[10]);
-        case 12:
-            return copy(c[11]);
-        default:
-            cout << "You chose a missing option.\n";
-            vector <int> nothing;
-            return nothing;
-    }
+     if (counts_number > 12 || counts_number < 1) {
+         cout << "You chose a missing option.\n";
+         vector<int> nothing;
+         return nothing;
+     }
+
+    return copy(c[counts_number-1]);
 }
 
 int main() {
