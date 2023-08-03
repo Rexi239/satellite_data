@@ -1,0 +1,9 @@
+data\krf20090227_49415_1_S1.thr
+data\krf20090406_62535_1_S1.thr
+data\krf20090409_53058_1_S2.thr
+data\krf20090523_34077_1_S2.thr
+data\krf20090605_74449_1_S1.thr
+data\krf20090718_65864_1_S2.thr
+data\krf20090719_5488_1_S2.thr
+data\krf20090804_73601_1_S2.thr
+data\krf20090929_16384_1_S2.thr
