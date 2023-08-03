@@ -14,17 +14,35 @@ vector <int> copy(vector <int> & v) {
     return result;
 }
 
+void read_filenames(vector<string> & filenames) {
+    ifstream in("filenames.txt");
+
+    if (!in.is_open()) {
+        cout << "Error opening file: filenames.txt\n";
+        return;
+    }
+
+    while (in.good()) {
+        string s;
+        in >> s;
+        filenames.push_back(s);
+    }
+
+    in.close();
+}
+
 void read_data (
         const string & file_name,
-        vector <double> & time1,
-        vector <double> & time2,
-        vector <vector <int> > & c
+        vector<double> & time1,
+        vector<double> & time2,
+        vector<vector<int>> & c
 )
 {
     ifstream in(file_name);
 
     if (!in.is_open()) {
         cout << "Error opening file: " << file_name;
+        cout << '\n';
         return;
     }
 
@@ -206,77 +224,36 @@ void where_are_the_bursts(
     }
 }
 
-string select_input_file_extended() {
+string select_input_file_extended(vector<string> & filenames) {
     cout << "You can read any file from list below. \n\n";
-    // мб как-то по другому отображать файлы, например, даты+
-    cout << "1. krf20090227_49415_1_S1.thr\n";
-    cout << "2. krf20090406_62535_1_S1.thr\n";
-    cout << "3. krf20090409_53058_1_S2.thr\n";
-    cout << "4. krf20090523_34077_1_S2.thr\n";
-    cout << "5. krf20090605_74449_1_S1.thr\n";
-    cout << "6. krf20090718_65864_1_S2.thr\n";
-    cout << "7. krf20090719_5488_1_S2.thr\n";
-    cout << "8. krf20090804_73601_1_S2.thr\n";
-    cout << "9. krf20090929_16384_1_S2.thr\n";
+
+    for (int i = 0; i < filenames.size(); ++i) {
+        cout << i << ". " << filenames[i] << '\n';
+    }
+
     cout << "\nEnter the number of the selected file to read it: ";
 
     int file_number;
     cin >> file_number;
 
-    switch(file_number){
-        case 1:
-            return "data\\krf20090227_49415_1_S1.thr";
-        case 2:
-            return "data\\krf20090406_62535_1_S1.thr";
-        case 3:
-            return "data\\krf20090409_53058_1_S2.thr";
-        case 4:
-            return "data\\krf20090523_34077_1_S2.thr";
-        case 5:
-            return "data\\krf20090605_74449_1_S1.thr";
-        case 6:
-            return "data\\krf20090718_65864_1_S2.thr";
-        case 7:
-            return "data\\krf20090719_5488_1_S2.thr";
-        case 8:
-            return "data\\krf20090804_73601_1_S2.thr";
-        case 9:
-            return "data\\krf20090929_16384_1_S2.thr";
-        default:
-            return "you have selected a missing option.\n";
-    }
+    if (file_number > filenames.size() || file_number < 1)
+        return "you have selected a missing option.\n";
+
+    return filenames[file_number - 1];
 }
 
-string select_input_file() {
+string select_input_file(vector<string> & filenames) {
     cout << "Enter the file number 1-9 to read it (0 - if you need help): ";
 
     int file_number;
     cin >> file_number;
 
-    switch(file_number){
-        case 0:
-            return select_input_file_extended();
-        case 1:
-            return "data\\krf20090227_49415_1_S1.thr";
-        case 2:
-            return "data\\krf20090406_62535_1_S1.thr";
-        case 3:
-            return "data\\krf20090409_53058_1_S2.thr";
-        case 4:
-            return "data\\krf20090523_34077_1_S2.thr";
-        case 5:
-            return "data\\krf20090605_74449_1_S1.thr";
-        case 6:
-            return "data\\krf20090718_65864_1_S2.thr";
-        case 7:
-            return "data\\krf20090719_5488_1_S2.thr";
-        case 8:
-            return "data\\krf20090804_73601_1_S2.thr";
-        case 9:
-            return "data\\krf20090929_16384_1_S2.thr";
-        default:
-            return "you have selected a missing option.\n";
-    }
+    if (file_number == 0)
+        return select_input_file_extended(filenames);
+    if (file_number > filenames.size() || file_number < 0)
+        return "you have selected a missing option.\n";
+
+    return filenames[file_number - 1];
 }
 
 vector<int> select_energy_interval(vector <vector <int> > & c){
@@ -294,8 +271,11 @@ vector<int> select_energy_interval(vector <vector <int> > & c){
 }
 
 int main() {
+    vector<string> fn;
+    read_filenames(fn);
+
     // выбираем, из какого файла читать данные
-    string file_name = select_input_file();
+    string file_name = select_input_file(fn);
 
     // задаем массивы для записи данных
     vector <double> time1;
