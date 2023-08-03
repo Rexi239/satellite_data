@@ -47,7 +47,6 @@ void read_data (
     }
 
     double t1, t2;
-    int c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12;
 
     // читаем данные массивов
     while (in.good()) {
@@ -228,7 +227,7 @@ string select_input_file_extended(vector<string> & filenames) {
     cout << "You can read any file from list below. \n\n";
 
     for (int i = 0; i < filenames.size(); ++i) {
-        cout << i << ". " << filenames[i] << '\n';
+        cout << i + 1 << ". " << filenames[i] << '\n';
     }
 
     cout << "\nEnter the number of the selected file to read it: ";
